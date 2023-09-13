@@ -1,0 +1,9 @@
+[Task]
+Description= Update apt cache
+ConditionPackageManager=pacman
+
+[Exec]
+Command=pacman -Sy
+
+[Exec]
+Command=groupadd sudo

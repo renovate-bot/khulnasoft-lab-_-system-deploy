@@ -1,0 +1,38 @@
+title: system-deploy
+email: infosulaimanbd@gmail.com
+description: >- 
+  Welcome to the system-deploy documentation. system-deploy is a
+  systemd inspired server deployment and configuration tool.
+baseurl: "/system-deploy"
+url: "https://khulnasoft-lab.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+github_username: khulnasoft-lab
+
+# Build settings
+#theme: just-the-docs
+remote_theme: pmarsceill/just-the-docs
+plugins:
+  - jekyll-feed
+  - jekyll-relative-links
+
+permalink: pretty
+exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile"]
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false
+
+relative_links:
+  enabled:     true
+  collections: true
+
+# Aux links for the upper right navigation
+aux_links:
+  "system-deploy on GitHub":
+    - "https://github.com/khulnasoft-lab/system-deploy"
+
+heading_anchors: true
+footer_content: "Copyright &copy; 2020 Md Sulaiman and Contributors. Distributed by an <a href=\"https://github.com/khulnasoft-lab/system-deploy/tree/master/LICENSE\">BSD 3-Clause license.</a>"

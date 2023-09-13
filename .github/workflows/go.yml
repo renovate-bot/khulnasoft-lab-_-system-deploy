@@ -1,0 +1,85 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    name: Linter
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go get -v -t -d ./...
+
+    - name: Run golangci-lint
+      uses: actions-contrib/golangci-lint@v1
+      
+    - name: Run gofmt
+      run: bash -c "test -z $(gofmt -s -l .)"
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go get -v -t -d ./...
+
+    - name: Build
+      run: go build -v ./cmd/system-deploy
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Upload system-deploy binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: system-deploy
+        path: ./system-deploy
+
+  integration:
+    name: Integration ${{ matrix.test }}|${{ matrix.container }}
+    needs: build
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    strategy:
+      matrix:
+        test:
+            - example
+            - copy-file
+            - usecases/create-user
+        container: ["ubuntu:latest", "archlinux:latest"]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download system deploy binary
+      uses: actions/download-artifact@v1
+      with:
+        name: system-deploy
+    
+    - name: Allow execution
+      run: chmod a+x ./system-deploy/system-deploy
+    
+    - name: Running system-deploy
+      # we ignore any error in the system-deploy binary (maybe cause that's intendet).
+      # integration tests should verify using ./verify.sh
+      run: bash -c "./system-deploy/system-deploy --env TEST=${{ matrix.test }} ./integration/${{ matrix.test }} || exit 0"
+      
+    - name: Verifying results
+      run: bash -c "set -e ; set -x ; TEST=${{ matrix.test }}; source ./integration/${{ matrix.test }}/verify.sh"
+        
+      
